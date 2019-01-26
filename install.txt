@@ -1,0 +1,17 @@
+1. Need one RabbitMQ server running somewhere, allowing guest access from the clients. The easiest way to achieve this is to have the following line in /etc/rabbitmq/rabbitmq.config:
+
+[{rabbit, [{loopback_users, []}]}].
+
+2. To upload test data, with a report interval of 10 seconds:
+
+java -cp target/transcoder-jar-with-dependencies.jar net.qyjohn.transcoder.PublishJobs jobs.txt upload 10000
+
+3. To publish jobs, wiht a report interval of 10 seconds
+
+java -cp target/transcoder-jar-with-dependencies.jar net.qyjohn.transcoder.PublishJobs jobs.txt transcode 10000
+
+
+4. To process jobs:
+
+java -cp target/transcoder-jar-with-dependencies.jar net.qyjohn.transcoder.Transcoder
+
