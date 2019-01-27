@@ -11,7 +11,7 @@ public class OldTranscoder extends Thread
 	DBConnection conn;
 	public int workerId;
 	ObjectStorageHandler storage;
-	public String bucketIn, bucketOut, workDir, action;
+	public String region, bucketIn, bucketOut, workDir, action;
 	long time1 = System.currentTimeMillis();
 	// Test files
 	String[] movies;
@@ -28,11 +28,12 @@ public class OldTranscoder extends Thread
 			Properties prop = new Properties();
 			InputStream input = new FileInputStream("config.properties");
 			prop.load(input);
+			region = prop.getProperty("region");
 			workDir = prop.getProperty("workDir");
 			movies  = prop.getProperty("movies").split(";");
 
 			// Cloud-specific configurations
-			storage = new S3Handler();
+			storage = new S3Handler(region);
 			bucketIn  = prop.getProperty("awsS3BucketIn");
 			bucketOut = prop.getProperty("awsS3BucketOut");
 		} catch (Exception e)

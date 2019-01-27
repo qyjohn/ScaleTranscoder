@@ -23,6 +23,7 @@ public class BasicWorker
 	public int workerId;
 	public String mqHostname;
 	public String mqJobQueue;
+	public String region;
 	public Connection connection;
 	public Channel channel;
 
@@ -45,11 +46,12 @@ public class BasicWorker
 			prop.load(input);
 			mqHostname = prop.getProperty("mqHostname");
 			mqJobQueue = prop.getProperty("mqJobQueue");
+			region = prop.getProperty("region");
 			workDir = prop.getProperty("workDir");
 			movies  = prop.getProperty("movies").split(";");
 
 			// Cloud-specific configurations
-			storage = new S3Handler();
+			storage = new S3Handler(region);
 			bucketIn  = prop.getProperty("awsS3BucketIn");
 			bucketOut = prop.getProperty("awsS3BucketOut");
 

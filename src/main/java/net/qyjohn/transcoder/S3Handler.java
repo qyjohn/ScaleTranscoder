@@ -12,10 +12,10 @@ public class S3Handler implements ObjectStorageHandler
 {
         public AmazonS3Client client;
 
-	public S3Handler()
+	public S3Handler(String region)
 	{
 		client = new AmazonS3Client();
-                client.configureRegion(Regions.AP_SOUTHEAST_2);
+		client.configureRegion(Regions.fromName(region));
 	}
 
 	public void upload(String bucket, String key, String fileFullPath)
