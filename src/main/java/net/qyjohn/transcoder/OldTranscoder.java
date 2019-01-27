@@ -28,7 +28,7 @@ public class OldTranscoder extends Thread
 			Properties prop = new Properties();
 			InputStream input = new FileInputStream("config.properties");
 			prop.load(input);
-			region = prop.getProperty("region");
+			region = prop.getProperty("awsRegion");
 			workDir = prop.getProperty("workDir");
 			movies  = prop.getProperty("movies").split(";");
 

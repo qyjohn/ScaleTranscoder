@@ -46,7 +46,7 @@ public class BasicWorker
 			prop.load(input);
 			mqHostname = prop.getProperty("mqHostname");
 			mqJobQueue = prop.getProperty("mqJobQueue");
-			region = prop.getProperty("region");
+			region = prop.getProperty("awsRegion");
 			workDir = prop.getProperty("workDir");
 			movies  = prop.getProperty("movies").split(";");
 
