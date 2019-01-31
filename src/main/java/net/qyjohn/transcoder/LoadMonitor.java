@@ -18,11 +18,12 @@ public class LoadMonitor extends Thread
 	String node_ip, test_id;
 	Connection db_connection;
 	Properties prop = new Properties();
-	String nicRxPath, nicTxPath, diskPath, cpuPath;
+	String nicRxPath, nicTxPath, diskPath, cpuPath, memPath;
 	long cpuUser, cpuSystem, cpuIdle, cpuIoWait, cpuTotal;
 	float cpuPercentUser, cpuPercentSystem, cpuPercentIdle, cpuPercentIoWait;
 	long diskReadSectors, diskWriteSectors, deltaDiskReadBytes, deltaDiskWriteBytes;
 	long nicRxBytes, nicTxBytes, deltaNicRxBytes, deltaNicTxBytes;
+	long memFree, memAvailable;
 	
 	public LoadMonitor(String nic, String disk)
 	{
@@ -31,6 +32,7 @@ public class LoadMonitor extends Thread
 		nicTxPath = "/sys/class/net/" + nic + "/statistics/tx_bytes";
 		diskPath  = "/sys/class/block/" + disk + "/stat"; 
 		cpuPath   = "/proc/stat";
+		memPath   = "/proc/meminfo";
 		
 		// Initialize all the parameters
 		getUsage();
@@ -62,6 +64,25 @@ public class LoadMonitor extends Thread
 			cpuPercentIdle   = 100 * (deltaCpuIdle   / deltaCpuTotal);
 			cpuPercentIoWait = 100 * (deltaCpuIoWait / deltaCpuTotal);
 
+			// Get MEM usage
+			BufferedReader br = new BufferedReader(new FileReader(memPath));
+			String line;
+			int pos;
+			line = br.readLine();	// MemTotal
+			line = br.readLine();  // MemFree
+			pos = line.indexOf(" ");
+			line = line.substring(pos).trim();
+			pos = line.indexOf(" ");
+			line = line.substring(0, pos).trim();	
+			memFree = Long.parseLong(line);		
+			line = br.readLine();  // MemAvailable
+			pos = line.indexOf(" ");
+			line = line.substring(pos).trim();
+			pos = line.indexOf(" ");
+			line = line.substring(0, pos).trim();	
+			memAvailable = Long.parseLong(line);		
+			br.close();
+			
 			// Get disk I/O
 			String[] diskInfo = readOneLine(diskPath).trim().split("\\s+");
 			long newDiskReadSectors  = Long.parseLong(diskInfo[2]);
@@ -75,7 +96,6 @@ public class LoadMonitor extends Thread
 			long newNicRxBytes = Long.parseLong(readOneLine(nicRxPath).trim());
 			long newNicTxBytes = Long.parseLong(readOneLine(nicTxPath).trim());
 			deltaNicRxBytes = newNicRxBytes - nicRxBytes;
-			System.out.println(newNicRxBytes + "\t" + nicRxBytes + "\t" + deltaNicRxBytes);
 			nicRxBytes = newNicRxBytes;
 			deltaNicTxBytes = newNicTxBytes - nicTxBytes;
 			nicTxBytes = newNicTxBytes;
@@ -90,7 +110,8 @@ public class LoadMonitor extends Thread
 	{
 		System.out.println(cpuPercentUser + "\t" + cpuPercentSystem + "\t" + cpuPercentIdle + "\t" + cpuPercentIoWait
 			+ "\t" + deltaDiskReadBytes + "\t" + deltaDiskWriteBytes
-			+ "\t" + deltaNicRxBytes + "\t" + deltaNicTxBytes);
+			+ "\t" + deltaNicRxBytes + "\t" + deltaNicTxBytes
+			+ "\t" + memFree + "\t" + memAvailable);
 	}
 	
 	public String readOneLine(String file)
