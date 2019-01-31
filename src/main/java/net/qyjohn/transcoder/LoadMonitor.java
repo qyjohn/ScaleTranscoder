@@ -19,7 +19,7 @@ public class LoadMonitor extends Thread
 	Connection db_connection;
 	Properties prop = new Properties();
 	String nicRxPath, nicTxPath, diskPath, cpuPath;
-	int cpuUser, cpuSystem, cpuIdle, cpuIoWait, cpuTotal;
+	long cpuUser, cpuSystem, cpuIdle, cpuIoWait, cpuTotal;
 	float cpuPercentUser, cpuPercentSystem, cpuPercentIdle, cpuPercentIoWait;
 	long diskReadSectors, diskWriteSectors, deltaDiskReadBytes, deltaDiskWriteBytes;
 	long nicRxBytes, nicTxBytes, deltaNicRxBytes, deltaNicTxBytes;
@@ -42,16 +42,16 @@ public class LoadMonitor extends Thread
 		{
 			// Get CPU usage
 			String[] cpuInfo = readOneLine(cpuPath).split("\\s+");
-			int newCpuUser   = Integer.parseInt(cpuInfo[1]);
-			int newCpuSystem = Integer.parseInt(cpuInfo[3]);
-			int newCpuIdle   = Integer.parseInt(cpuInfo[4]);
-			int newCpuIoWait = Integer.parseInt(cpuInfo[5]);	// this is part of cpuIdle
-			int newCpuTotal    = cpuUser + cpuSystem + cpuIdle;
+			long newCpuUser   = Long.parseLong(cpuInfo[1]);
+			long newCpuSystem = Long.parseLong(cpuInfo[3]);
+			long newCpuIdle   = Long.parseLong(cpuInfo[4]);
+			long newCpuIoWait = Long.parseLong(cpuInfo[5]);	// this is part of cpuIdle
+			long newCpuTotal    = cpuUser + cpuSystem + cpuIdle;
 			float deltaCpuTotal  = newCpuTotal  - cpuTotal;
-			int deltaCpuUser   = newCpuUser   - cpuUser;
-			int deltaCpuSystem = newCpuSystem - cpuSystem;
-			int deltaCpuIdle   = newCpuIdle   - cpuIdle;
-			int deltaCpuIoWait = newCpuIoWait - cpuIoWait;
+			long deltaCpuUser   = newCpuUser   - cpuUser;
+			long deltaCpuSystem = newCpuSystem - cpuSystem;
+			long deltaCpuIdle   = newCpuIdle   - cpuIdle;
+			long deltaCpuIoWait = newCpuIoWait - cpuIoWait;
 			cpuTotal  = newCpuTotal;
 			cpuUser   = newCpuUser;
 			cpuSystem = newCpuSystem;
@@ -60,17 +60,17 @@ public class LoadMonitor extends Thread
 			cpuPercentUser   = 100 * (deltaCpuUser   / deltaCpuTotal);
 			cpuPercentSystem = 100 * (deltaCpuSystem / deltaCpuTotal);
 			cpuPercentIdle   = 100 * (deltaCpuIdle   / deltaCpuTotal);
-			cpuPercentIoWait = 100 * (deltaCpuIoWait / deltaCpuTotal);			
+			cpuPercentIoWait = 100 * (deltaCpuIoWait / deltaCpuTotal);
 
 			// Get disk I/O
 			String[] diskInfo = readOneLine(diskPath).trim().split("\\s+");
-			long newDiskReadSectors = Long.parseLong(diskInfo[2]);
+			long newDiskReadSectors  = Long.parseLong(diskInfo[2]);
 			long newDiskWriteSectors = Long.parseLong(diskInfo[6]);
 			deltaDiskReadBytes    = 512 * (newDiskReadSectors - diskReadSectors);
 			diskReadSectors  = newDiskReadSectors;
 			deltaDiskWriteBytes   = 512 * (newDiskWriteSectors - diskWriteSectors);
 			diskWriteSectors = newDiskWriteSectors;
-			
+
 			// Get network I/O
 			long newNicRxBytes = Long.parseLong(readOneLine(nicRxPath).trim());
 			long newNicTxBytes = Long.parseLong(readOneLine(nicTxPath).trim());
@@ -82,7 +82,7 @@ public class LoadMonitor extends Thread
 		} catch (Exception e)
 		{
 			System.out.println(e.getMessage());
-			e.printStackTrace();			
+			e.printStackTrace();
 		}
 	}
 	
@@ -105,7 +105,7 @@ public class LoadMonitor extends Thread
 		} catch (Exception e)
 		{
 			return null;
-		}		
+		}
 	}
 	
 
