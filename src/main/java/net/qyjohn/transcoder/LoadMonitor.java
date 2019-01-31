@@ -21,8 +21,8 @@ public class LoadMonitor extends Thread
 	String nicRxPath, nicTxPath, diskPath, cpuPath;
 	int cpuUser, cpuSystem, cpuIdle, cpuIoWait, cpuTotal;
 	float cpuPercentUser, cpuPercentSystem, cpuPercentIdle, cpuPercentIoWait;
-	int diskReadSectors, diskWriteSectors, deltaDiskReadBytes, deltaDiskWriteBytes;
-	int nicRxBytes, nicTxBytes, deltaNicRxBytes, deltaNicTxBytes;
+	long diskReadSectors, diskWriteSectors, deltaDiskReadBytes, deltaDiskWriteBytes;
+	long nicRxBytes, nicTxBytes, deltaNicRxBytes, deltaNicTxBytes;
 	
 	public LoadMonitor(String nic, String disk)
 	{
@@ -64,23 +64,25 @@ public class LoadMonitor extends Thread
 
 			// Get disk I/O
 			String[] diskInfo = readOneLine(diskPath).trim().split("\\s+");
-			int newDiskReadSectors = Integer.parseInt(diskInfo[2]);
-			int newDiskWriteSectors = Integer.parseInt(diskInfo[6]);
+			long newDiskReadSectors = Long.parseLong(diskInfo[2]);
+			long newDiskWriteSectors = Long.parseLong(diskInfo[6]);
 			deltaDiskReadBytes    = 512 * (newDiskReadSectors - diskReadSectors);
 			diskReadSectors  = newDiskReadSectors;
 			deltaDiskWriteBytes   = 512 * (newDiskWriteSectors - diskWriteSectors);
 			diskWriteSectors = newDiskWriteSectors;
 			
 			// Get network I/O
-			int newNicRxBytes = Integer.parseInt(readOneLine(nicRxPath).trim());
-			int newNicTxBytes = Integer.parseInt(readOneLine(nicTxPath).trim());
+			long newNicRxBytes = Long.parseLong(readOneLine(nicRxPath).trim());
+			long newNicTxBytes = Long.parseLong(readOneLine(nicTxPath).trim());
 			deltaNicRxBytes = newNicRxBytes - nicRxBytes;
+			System.out.println(newNicRxBytes + "\t" + nicRxBytes + "\t" + deltaNicRxBytes);
 			nicRxBytes = newNicRxBytes;
 			deltaNicTxBytes = newNicTxBytes - nicTxBytes;
 			nicTxBytes = newNicTxBytes;
 		} catch (Exception e)
 		{
-			
+			System.out.println(e.getMessage());
+			e.printStackTrace();			
 		}
 	}
 	
